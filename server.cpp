@@ -79,8 +79,24 @@ int main(){
         WSACleanup();
         return 1;
     }
-    
     cout << "server has started listening on port : " << port << endl;
+
+    //accept 
+    SOCKET clientSocket = accept(listenSocket, nullptr, nullptr);
+    if(clientSocket == INVALID_SOCKET){
+        cout << "invalid client socket" << endl;
+    }
+
+    char buffer[4096];
+    int bytesrecvd= recv(clientSocket, buffer, sizeof(buffer), 0);
+
+    string message(buffer, bytesrecvd);
+    cout << "message from client: " << message << endl;
+
+    closesocket(clientSocket);
+
+    closesocket(listenSocket);
+
 
     WSACleanup();
     return 0;

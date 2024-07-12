@@ -51,9 +51,10 @@ int main(){
     }
 
     //create address structure
+    int port = 12345;
     sockaddr_in serveraddr;
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons(12345);
+    serveraddr.sin_port = htons(port);
 
     //convert the ipaddress(0.0.0.0) put it inside the sin_family in binary form
     if (InetPton(AF_INET, _T("0.0.0.0"), &serveraddr.sin_addr) != 1){
@@ -70,6 +71,16 @@ int main(){
         WSACleanup();
         return 1;
     }
+
+    //listen
+    if(listen(listenSocket, SOMAXCONN) == SOCKET_ERROR){
+        cout << "listen failed" <<endl;
+        closesocket(listenSocket);
+        WSACleanup();
+        return 1;
+    }
+    
+    cout << "server has started listening on port : " << port << endl;
 
     WSACleanup();
     return 0;

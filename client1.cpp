@@ -38,7 +38,7 @@ void SendMsg(SOCKET s){
         getline(cin, message);
         string msg = name + " : " + message;
         int bytesent = send(s, msg.c_str(), msg.length(), 0);
-        if(bytesent = SOCKET_ERROR){
+        if(bytesent == SOCKET_ERROR){
             cout << "error sending message" << endl;
             break;
         }

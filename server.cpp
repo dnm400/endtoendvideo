@@ -2,6 +2,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h> //for inetpton
 #include <tchar.h>
+#include <thread>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -35,9 +38,42 @@ bool Initialize(){
 
 }
 
+void InteractWithClient(SOCKET clientSocket, vector<SOCKET>& clients){
+    //send/recv client
+
+    cout << "client connected" << endl;   
+    char buffer[4096];
+
+    while (1) {
+
+    int bytesrecvd= recv(clientSocket, buffer, sizeof(buffer), 0);
+
+    if(bytesrecvd <= 0) {
+        cout << "client disconnected" << endl;
+    }
+    string message(buffer, bytesrecvd);
+    cout << "message from client: " << message << endl;
+
+    for(auto client : clients) {
+        if(client != clientSocket){
+        send(client, message.c_str(), message.length(), 0);
+        }
+    }
+
+    }
+
+    auto it = find(clients.begin(), clients.end(), clientSocket);
+    if ( it != clients.end()){
+        clients.erase(it);
+    }
+
+    closesocket(clientSocket);
+}
+
 int main(){
     if(!Initialize()){
         cout << "winsock initialization failed" << endl;
+        return 1;
 
     }
 
@@ -80,20 +116,20 @@ int main(){
         return 1;
     }
     cout << "server has started listening on port : " << port << endl;
+    vector<SOCKET> clients;
 
+    while(1){
     //accept 
     SOCKET clientSocket = accept(listenSocket, nullptr, nullptr);
     if(clientSocket == INVALID_SOCKET){
         cout << "invalid client socket" << endl;
     }
 
-    char buffer[4096];
-    int bytesrecvd= recv(clientSocket, buffer, sizeof(buffer), 0);
+    clients.push_back(clientSocket);
+    thread t1(InteractWithClient, clientSocket, ref(clients));
+    }
+    
 
-    string message(buffer, bytesrecvd);
-    cout << "message from client: " << message << endl;
-
-    closesocket(clientSocket);
 
     closesocket(listenSocket);
 

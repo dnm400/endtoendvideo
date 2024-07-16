@@ -61,7 +61,8 @@ void ReceiveMsg(SOCKET s){
     while(1){
         recvlength = recv(s, buffer, sizeof(buffer), 0);
         if(recvlength <= 0){
-            cout << "isconnected from the server" << endl;
+            cout << "disconnected from the server" << endl;
+            break;
 
         }
         else{

@@ -57,10 +57,16 @@ void SendMsg(SOCKET s){
 void ReceiveMsg(SOCKET s){
     char buffer[4096];
     int recvlength;
+    string msg = "";
     while(1){
         recvlength = recv(s, buffer, sizeof(buffer), 0);
         if(recvlength <= 0){
             cout << "isconnected from the server" << endl;
+
+        }
+        else{
+            msg = string(buffer, recvlength);
+            cout << msg << endl;
 
         }
 
